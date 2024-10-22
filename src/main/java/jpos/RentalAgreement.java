@@ -1,8 +1,13 @@
 package jpos;
 
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+
 
 public class RentalAgreement {
     Tool tool;
@@ -39,8 +44,60 @@ public class RentalAgreement {
 
     private int calculateChargeDays() {
         // Implement logic to calculate chargeable days based on tool type and holidays
+        LocalDate startDate = LocalDate.ofInstant(checkoutDate.toInstant(), ZoneId.systemDefault());
+        LocalDate endDate = LocalDate.ofInstant(dueDate.toInstant(), ZoneId.systemDefault());
+        int chargeableDays = 0;
+        for (LocalDate date = startDate.plusDays(1); !date.isAfter(endDate); date = date.plusDays(1)) {
+            if ((tool.weekdayCharge && isWeekday(date)) || (tool.weekendCharge && isWeekend(date)) || (tool.holidayCharge && isHoliday(date))) {
+                chargeableDays++;
+            }
+        }
         return rentalDays; // Placeholder
     }
+
+    public static boolean isWeekend(LocalDate date) {
+        return date.getDayOfWeek().getValue() >= 6;
+    }
+
+    public static boolean isWeekday(LocalDate date) {
+        return date.getDayOfWeek().getValue() < 6;
+    }
+
+//Independence Day (July 4th) is observed on the closest weekday if it falls on a weekend.
+//Labor Day is defined as the first Monday of September.
+
+    public static boolean isHoliday(LocalDate date) {
+        // Check for Independence Day
+        if (date.getMonth() == Month.JULY && date.getDayOfMonth() == 4) {
+            return true;
+        }
+
+        // Calculate Independence Day observed date
+        LocalDate independenceDayObserved = LocalDate.of(date.getYear(), Month.JULY, 4);
+        if (independenceDayObserved.getDayOfWeek() == DayOfWeek.SATURDAY) {
+            independenceDayObserved = independenceDayObserved.minusDays(1); // Friday
+        } else if (independenceDayObserved.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            independenceDayObserved = independenceDayObserved.plusDays(1); // Monday
+        }
+
+        // Check if the date is the observed Independence Day
+        if (date.equals(independenceDayObserved)) {
+            return true;
+        }
+        // Check for Labor Day (First Monday in September)
+        LocalDate laborDay = getLaborDay(date.getYear());
+        return date.equals(laborDay); // Labor Day check
+    }
+
+    private static LocalDate getLaborDay(int year) {
+        LocalDate septemberFirst = LocalDate.of(year, Month.SEPTEMBER, 1);
+        // Find the first Monday of September
+        while (septemberFirst.getDayOfWeek() != DayOfWeek.MONDAY) {
+            septemberFirst = septemberFirst.plusDays(1);
+        }
+        return septemberFirst; // This is Labor Day
+    }
+    
 
     public void printAgreement() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
