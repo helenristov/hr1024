@@ -52,7 +52,7 @@ public class RentalAgreement {
                 chargeableDays++;
             }
         }
-        return rentalDays; // Placeholder
+        return chargeableDays; // Placeholder
     }
 
     public static boolean isWeekend(LocalDate date) {
