@@ -8,6 +8,7 @@
 * [Full Scale Architecture](#full-scale-architecture)
 * [Code](#code)
 * [Extended Requirement](#extended-requirement)
+* [Testing](#junit-test-cases)
 
 In this exercise we will design and demo some code for a java application which can be used to check-out tools
 
@@ -248,3 +249,6 @@ public class Store {
         return new RentalAgreement(tool, rentalDays, checkoutDate, discountPercent);
     }
 }
+### Testing
+
+In order to provide a robust application, a junit testing harness can be developed and integrated into the build. As the build becomes larger, this will play an important role in regression testing development changes. To start, a few cases will be integrated to test the logic and calculations around tool rentals and the fields in the rental agreement.
